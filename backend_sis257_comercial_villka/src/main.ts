@@ -16,7 +16,9 @@ async function bootstrap() {
     .setTitle('Comercial Vill-K API')
     .setDescription('API para gestión de llantas y servicios')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 

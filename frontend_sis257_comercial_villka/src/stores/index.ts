@@ -1,31 +1,38 @@
 import { defineStore } from 'pinia'
-import { getTokenFromLocalStorage } from '@/helpers'
-import http from '@/plugins/axios'
 import router from '@/router'
+import axios from '@/plugins/axios'
 
-const useAuthStore = defineStore('auth', {
+export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: localStorage.getItem('user') || '',
-    token: getTokenFromLocalStorage(),
-    returnUrl: null || '',
+    token: localStorage.getItem('token') || null,
+    rol: localStorage.getItem('rol') || null,
   }),
-  getters: {},
+  getters: {
+    isAdmin: (state) => state.rol === 'admin',
+    isEmpleado: (state) => state.rol === 'empleado',
+    isAuthenticated: (state) => !!state.token,
+  },
   actions: {
     async login(usuario: string, clave: string) {
-      await http.post('auth/login', { usuario, clave }).then((response) => {
-        this.user = response.data.usuario
-        this.token = response.data.access_token
-        localStorage.setItem('user', this.user || '')
-        localStorage.setItem('token', this.token || '')
-        router.push(this.returnUrl || '/')
-      })
+      const response = await axios.post('auth/login', { usuario, clave })
+
+      this.user = response.data.usuario
+      this.token = response.data.access_token
+      this.rol = response.data.rol
+
+      localStorage.setItem('user', this.user)
+      localStorage.setItem('token', this.token || '')
+      localStorage.setItem('rol', this.rol || '')
+
+      router.push('/ventas')
     },
     logout() {
       localStorage.clear()
-      this.$reset()
+      this.user = ''
+      this.token = null
+      this.rol = null
       router.push('/login')
     },
   },
 })
-
-export { useAuthStore }

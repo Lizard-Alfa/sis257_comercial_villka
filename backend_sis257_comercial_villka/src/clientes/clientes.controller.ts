@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -29,6 +30,11 @@ export class ClientesController {
   @Get()
   findAll() {
     return this.clientesService.findAll();
+  }
+
+  @Get('buscar')
+  buscar(@Query('q') query: string) {
+    return this.clientesService.buscar(query);
   }
 
   @Get(':id')
