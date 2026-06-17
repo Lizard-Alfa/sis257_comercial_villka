@@ -13,17 +13,17 @@ export class LlantasService {
   ) {}
 
   create(dto: CreateLlantaDto) {
-    return this.llantasRepository.save(dto);
+    return this.llantasRepository.save(this.llantasRepository.create(dto));
   }
 
   findAll() {
-    return this.llantasRepository.find({ relations: { categoria: true } });
+    return this.llantasRepository.find({ relations: { marca: true } });
   }
 
   async findOne(id: number) {
     const llanta = await this.llantasRepository.findOne({
       where: { id },
-      relations: { categoria: true },
+      relations: { marca: true },
     });
     if (!llanta)
       throw new NotFoundException(`Llanta con ID ${id} no encontrada`);
@@ -31,13 +31,13 @@ export class LlantasService {
   }
 
   async update(id: number, dto: UpdateLlantaDto) {
-    await this.findOne(id);
-    await this.llantasRepository.update(id, dto);
-    return this.findOne(id);
+    const llanta = await this.findOne(id);
+    Object.assign(llanta, dto);
+    return this.llantasRepository.save(llanta);
   }
 
   async remove(id: number) {
-    await this.findOne(id);
-    return this.llantasRepository.softDelete(id);
+    const llanta = await this.findOne(id);
+    return this.llantasRepository.softRemove(llanta);
   }
 }

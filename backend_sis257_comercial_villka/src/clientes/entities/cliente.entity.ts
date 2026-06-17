@@ -8,7 +8,7 @@ export class Cliente {
   @Column('varchar', { length: 20, unique: true })
   ci_nit: string;
 
-  @Column('varchar', { length: 100 })
+  @Column('varchar', { length: 100, name: 'nombre_completo' })
   nombre_completo: string;
 
   @Column('varchar', { length: 15 })

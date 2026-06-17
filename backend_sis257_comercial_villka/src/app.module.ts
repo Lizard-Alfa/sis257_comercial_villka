@@ -1,20 +1,33 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+// Entidades existentes
 import { Categoria } from './categorias/entities/categoria.entity';
 import { Servicio } from './servicios/entities/servicio.entity';
 import { Cliente } from './clientes/entities/cliente.entity';
 import { Llanta } from './llantas/entities/llanta.entity';
+import { Venta } from './ventas/entities/venta.entity';
+import { DetalleVenta } from './ventas/entities/detalle-venta.entity';
+import { Usuario } from './usuarios/entities/usuario.entity';
+// NUEVAS Entidades
+import { Marca } from './marcas/entities/marca.entity';
+import { Modelo } from './modelos/entities/modelo.entity';
+import { Proveedor } from './proveedores/entities/proveedor.entity';
+import { Compra } from './compras/entities/compra.entity';
+import { DetalleCompra } from './detalle-compras/entities/detalle-compra.entity';
+// Módulos
 import { CategoriasModule } from './categorias/categorias.module';
 import { ServiciosModule } from './servicios/servicios.module';
 import { ClientesModule } from './clientes/clientes.module';
 import { LlantasModule } from './llantas/llantas.module';
-import { Venta } from './ventas/entities/venta.entity';
-import { DetalleVenta } from './ventas/entities/detalle-venta.entity';
 import { VentasModule } from './ventas/ventas.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { AuthModule } from './auth/auth.module';
-import { Usuario } from './usuarios/entities/usuario.entity';
+import { ProveedoresModule } from './proveedores/proveedores.module';
+import { ComprasModule } from './compras/compras.module';
+import { MarcasModule } from './marcas/marcas.module';
+import { ModelosModule } from './modelos/modelos.module';
+import { DetalleComprasModule } from './detalle-compras/detalle-compras.module';
 
 @Module({
   imports: [
@@ -34,8 +47,14 @@ import { Usuario } from './usuarios/entities/usuario.entity';
         Venta,
         DetalleVenta,
         Usuario,
+        // ENTIDADES AÑADIDAS AQUÍ
+        Marca,
+        Modelo,
+        Proveedor,
+        Compra,
+        DetalleCompra,
       ],
-      synchronize: true,
+      synchronize: false, // Para evitar Errores
     }),
     CategoriasModule,
     ServiciosModule,
@@ -44,6 +63,11 @@ import { Usuario } from './usuarios/entities/usuario.entity';
     VentasModule,
     UsuariosModule,
     AuthModule,
+    ProveedoresModule,
+    ComprasModule,
+    MarcasModule,
+    ModelosModule,
+    DetalleComprasModule,
   ],
 })
 export class AppModule {}

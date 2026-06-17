@@ -24,7 +24,7 @@ export class CreateLlantaDto {
   @IsDefined({ message: 'La marca es obligatoria' })
   @IsString({ message: 'La marca debe ser texto' })
   @MaxLength(100, { message: 'Máximo 100 caracteres' })
-  readonly marca: string;
+  readonly marca_id: number;
 
   @ApiProperty({ example: 'PRIMACY 4' })
   @IsDefined({ message: 'El modelo es obligatorio' })
