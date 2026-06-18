@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -16,7 +17,8 @@ export class Compra {
   @Column({ name: 'proveedor_id' })
   proveedor_id: number;
 
-  @ManyToOne(() => Proveedor, (proveedor) => proveedor.compras)
+  @ManyToOne(() => Proveedor, { eager: true })
+  @JoinColumn({ name: 'proveedor_id' })
   proveedor: Proveedor;
 
   @Column('date', { default: () => 'CURRENT_DATE' })
@@ -31,6 +33,6 @@ export class Compra {
   @Column('varchar', { length: 500, nullable: true })
   observaciones: string;
 
-  @OneToMany(() => DetalleCompra, (detalle) => detalle.compra)
+  @OneToMany(() => DetalleCompra, (detalle) => detalle.compra, { eager: true })
   detalles: DetalleCompra[];
 }

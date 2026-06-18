@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "animate.css": "^4.1.1",
+    "vue3-carousel": "^0.17.0"
+  }
+}

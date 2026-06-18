@@ -40,7 +40,7 @@ onMounted(async () => {
   }
 })
 
-// ✅ MEJORA 1: Mostrar últimos 3 clientes al enfocar (query vacío)
+// Mostrar últimos 3 clientes
 const buscarCliente = async (event: { query: string }) => {
   const query = event.query.toLowerCase()
 
@@ -60,6 +60,20 @@ const buscarCliente = async (event: { query: string }) => {
     c.nombre_completo.toLowerCase().includes(query)
   ).slice(0, 10)
 }
+//Para encontrar las llantas
+const buscadorLlantas = ref('')
+
+const llantasFiltradas = computed(() => {
+  const query = buscadorLlantas.value.toLowerCase().trim()
+  if (!query) return llantas.value
+
+  return llantas.value.filter(l =>
+    l.codigo?.toLowerCase().includes(query) ||
+    l.marca?.nombre?.toLowerCase().includes(query) ||
+    l.modelo?.toLowerCase().includes(query) ||
+    l.medida?.toLowerCase().includes(query)
+  )
+})
 
 const agregarLlanta = (llanta: Llanta) => {
   if (llanta.stock <= 0) {
@@ -98,9 +112,9 @@ const agregarServicio = (servicio: { id: number; nombre: string; precio: number 
 
 const eliminarItem = (index: number) => itemsVenta.value.splice(index, 1)
 
-// ✅ MEJORA 2: Función para disminuir cantidad (se detiene en 1)
+// Disminuir cantidad (se detiene en 1)
 const disminuirCantidad = (index: number) => {
-    const item = itemsVenta.value[index]
+  const item = itemsVenta.value[index]
   if (item && item.cantidad > 1) {
     item.cantidad--
     item.subtotal = item.cantidad * item.precio_unitario
@@ -190,9 +204,20 @@ const servicios = ref([
         <div class="card productos-card">
           <TabView v-model:activeIndex="tabActiva">
             <TabPanel value="llantas">
-              <template #header><span>Llantas</span></template>
-              <DataTable :value="llantas" class="p-datatable-sm" scrollable scrollHeight="flex"
-                :paginator="llantas.length > 8" :rows="8">
+              <template #header><span>Llantas ({{ llantasFiltradas.length }})</span></template>
+
+              <!-- Buscador local -->
+              <div class="flex gap-2 mb-2">
+                <span class="p-input-icon-left flex-1">
+                  <i class="pi pi-search" />
+                  <InputText v-model="buscadorLlantas" placeholder="Buscar por código, marca, modelo o medida..."
+                    class="w-full" />
+                </span>
+              </div>
+
+              <DataTable :value="llantasFiltradas" class="p-datatable-sm" scrollable scrollHeight="350px"
+                :paginator="llantasFiltradas.length > 10" :rows="10" :rowsPerPageOptions="[10, 20, 50]"
+                emptyMessage="No se encontraron llantas">
                 <Column field="codigo" header="Código" style="width: 100px"></Column>
                 <Column header="Marca" style="width: 120px">
                   <template #body="{ data }">{{ data.marca?.nombre || '' }}</template>
@@ -204,7 +229,9 @@ const servicios = ref([
                 </Column>
                 <Column field="stock" header="Stock" style="width: 80px">
                   <template #body="{ data }">
-                    <span :class="data.stock > 0 ? 'text-green-600' : 'text-red-600'">{{ data.stock }}</span>
+                    <span :class="data.stock > 0 ? 'text-green-600 font-bold' : 'text-red-600'">
+                      {{ data.stock }}
+                    </span>
                   </template>
                 </Column>
                 <Column header="" style="width: 60px">
@@ -247,7 +274,7 @@ const servicios = ref([
                   <div class="text-sm text-500">{{ item.cantidad }} x {{ item.precio_unitario }} Bs.</div>
                 </div>
                 <div class="text-right font-bold">{{ item.subtotal }} Bs.</div>
-                <!-- ✅ MEJORA 3: Botones disminuir y eliminar -->
+                <!-- Botones disminuir y eliminar -->
                 <div class="flex gap-1">
                   <Button icon="pi pi-minus" class="p-button-sm p-button-rounded p-button-warning"
                     @click="disminuirCantidad(index)" v-tooltip.top="'Disminuir cantidad'" />

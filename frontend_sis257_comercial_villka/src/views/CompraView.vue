@@ -67,16 +67,23 @@ const CompraAPI = {
 
 const loadCompras = async () => {
   try {
-    const [resCompras, resProveedores, resLlantas] = await Promise.all([
-      CompraAPI.getAll(),
+    // Cargar proveedores y llantas
+    const [resProveedores, resLlantas] = await Promise.all([
       http.get<Proveedor[]>('/proveedores'),
       http.get<Llanta[]>('/llantas'),
     ])
-    compras.value = resCompras.data
     proveedores.value = resProveedores.data
     llantas.value = resLlantas.data
   } catch {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron cargar los datos', life: 3000 })
+    toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron cargar proveedores/llantas', life: 3000 })
+  }
+  // Compras por separado
+  try {
+    const resCompras = await CompraAPI.getAll()
+    compras.value = resCompras.data
+  } catch {
+    console.warn('No se pudieron cargar las compras')
+    compras.value = []
   }
 }
 
