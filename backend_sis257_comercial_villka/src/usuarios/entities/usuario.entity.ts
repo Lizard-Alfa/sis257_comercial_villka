@@ -1,4 +1,11 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('usuarios')
 export class Usuario {
@@ -16,6 +23,9 @@ export class Usuario {
 
   @Column('varchar', { length: 100, nullable: true })
   email: string;
+
+  @Column('varchar', { length: 20, default: 'empleado' })
+  rol: string;
 
   @Column('boolean', { default: true })
   activo: boolean;

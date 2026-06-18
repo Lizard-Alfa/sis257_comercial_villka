@@ -13,6 +13,8 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { VentasService } from './ventas.service';
 import { CreateVentaDto } from './dto/create-venta.dto';
 import { UpdateVentaDto } from './dto/update-venta.dto';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 
 @ApiTags('ventas')
 @ApiBearerAuth() // Para que Swagger pida el token
@@ -44,5 +46,12 @@ export class VentasController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.ventasService.remove(+id);
+  }
+
+  @Patch(':id/anular')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin') // Solo admin anula
+  anular(@Param('id') id: string) {
+    return this.ventasService.anularVenta(+id);
   }
 }

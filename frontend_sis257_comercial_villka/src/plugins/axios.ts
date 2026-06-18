@@ -1,19 +1,17 @@
-import Axios, { type AxiosInstance } from 'axios'
-import { useAuthStore } from '@/stores'
+import axios from 'axios'
 
-const axios: AxiosInstance = Axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL_ENDPOINT,
+const http = axios.create({
+  baseURL: 'http://localhost:3000/api',
+  timeout: 10000,
 })
 
-axios.interceptors.request.use((config) => {
-  const authStore = useAuthStore()
-  if (config.headers) {
-    config.headers['Content-type'] = 'application/json'
-    if (authStore.token) {
-      config.headers['Authorization'] = 'Bearer ' + authStore.token
-    }
+// Interceptor para agregar el token automáticamente
+http.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
   }
   return config
 })
 
-export default axios
+export default http

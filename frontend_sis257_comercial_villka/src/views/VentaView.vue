@@ -40,15 +40,25 @@ onMounted(async () => {
   }
 })
 
+// ✅ MEJORA 1: Mostrar últimos 3 clientes al enfocar (query vacío)
 const buscarCliente = async (event: { query: string }) => {
   const query = event.query.toLowerCase()
+
+  if (query.length === 0) {
+    // Mostrar últimos 3 clientes registrados
+    clientesSugeridos.value = clientes.value.slice(-3).reverse()
+    return
+  }
+
   if (query.length < 2) {
     clientesSugeridos.value = []
     return
   }
+
   clientesSugeridos.value = clientes.value.filter(c =>
-    c.ci_nit.toLowerCase().includes(query) || c.nombre_completo.toLowerCase().includes(query)
-  )
+    c.ci_nit.toLowerCase().includes(query) ||
+    c.nombre_completo.toLowerCase().includes(query)
+  ).slice(0, 10)
 }
 
 const agregarLlanta = (llanta: Llanta) => {
@@ -61,11 +71,13 @@ const agregarLlanta = (llanta: Llanta) => {
     if (existente.cantidad < llanta.stock) {
       existente.cantidad++
       existente.subtotal = existente.cantidad * existente.precio_unitario
+    } else {
+      toast.add({ severity: 'warn', summary: 'Stock máximo', detail: 'No hay más unidades disponibles', life: 3000 })
     }
   } else {
     itemsVenta.value.push({
       tipo: 'llanta', item_id: llanta.id,
-      descripcion: `${llanta.marca} ${llanta.modelo} ${llanta.medida}`,
+      descripcion: `${llanta.marca?.nombre || ''} ${llanta.modelo} ${llanta.medida}`,
       precio_unitario: llanta.precio, cantidad: 1, subtotal: llanta.precio,
     })
   }
@@ -85,6 +97,23 @@ const agregarServicio = (servicio: { id: number; nombre: string; precio: number 
 }
 
 const eliminarItem = (index: number) => itemsVenta.value.splice(index, 1)
+
+// ✅ MEJORA 2: Función para disminuir cantidad (se detiene en 1)
+const disminuirCantidad = (index: number) => {
+    const item = itemsVenta.value[index]
+  if (item && item.cantidad > 1) {
+    item.cantidad--
+    item.subtotal = item.cantidad * item.precio_unitario
+  } else if (item && item.cantidad === 1) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Cantidad mínima',
+      detail: 'No se puede reducir más. Use el botón eliminar si desea quitar el producto.',
+      life: 3000
+    })
+  }
+}
+
 const subtotal = computed(() => itemsVenta.value.reduce((sum, i) => sum + i.subtotal, 0))
 
 const crearCliente = async () => {
@@ -134,7 +163,8 @@ const servicios = ref([
       <h2 class="m-0"><i class="pi pi-shopping-cart mr-2"></i>Nueva Venta</h2>
       <div class="flex gap-2">
         <Button label="Cancelar" icon="pi pi-times" class="p-button-secondary" @click="$router.push('/')" />
-        <Button label="Guardar Venta" icon="pi pi-check" class="p-button-success" @click="guardarVenta" :disabled="itemsVenta.length === 0" />
+        <Button label="Guardar Venta" icon="pi pi-check" class="p-button-success" @click="guardarVenta"
+          :disabled="itemsVenta.length === 0" />
       </div>
     </div>
     <div class="venta-body">
@@ -143,7 +173,7 @@ const servicios = ref([
           <h5 class="mt-0 mb-3"><i class="pi pi-user mr-2"></i>Cliente</h5>
           <div class="flex gap-2 mb-3">
             <AutoComplete v-model="clienteSeleccionado" :suggestions="clientesSugeridos" @complete="buscarCliente"
-              field="nombre_completo" placeholder="Buscar por CI/NIT o Nombre..." class="flex-1" dropdown />
+              optionLabel="nombre_completo" placeholder="Buscar por CI/NIT o Nombre..." class="flex-1" dropdown />
             <Button icon="pi pi-plus" label="Nuevo" class="p-button-success" @click="showNuevoCliente = true" />
           </div>
           <div v-if="clienteSeleccionado" class="cliente-info p-3 bg-gray-100 border-round">
@@ -164,7 +194,9 @@ const servicios = ref([
               <DataTable :value="llantas" class="p-datatable-sm" scrollable scrollHeight="flex"
                 :paginator="llantas.length > 8" :rows="8">
                 <Column field="codigo" header="Código" style="width: 100px"></Column>
-                <Column field="marca" header="Marca" style="width: 120px"></Column>
+                <Column header="Marca" style="width: 120px">
+                  <template #body="{ data }">{{ data.marca?.nombre || '' }}</template>
+                </Column>
                 <Column field="modelo" header="Modelo"></Column>
                 <Column field="medida" header="Medida" style="width: 120px"></Column>
                 <Column header="Precio" style="width: 100px">
@@ -177,7 +209,8 @@ const servicios = ref([
                 </Column>
                 <Column header="" style="width: 60px">
                   <template #body="{ data }">
-                    <Button icon="pi pi-plus" class="p-button-sm p-button-success" @click="agregarLlanta(data)" :disabled="data.stock <= 0" />
+                    <Button icon="pi pi-plus" class="p-button-sm p-button-success" @click="agregarLlanta(data)"
+                      :disabled="data.stock <= 0" />
                   </template>
                 </Column>
               </DataTable>
@@ -214,7 +247,13 @@ const servicios = ref([
                   <div class="text-sm text-500">{{ item.cantidad }} x {{ item.precio_unitario }} Bs.</div>
                 </div>
                 <div class="text-right font-bold">{{ item.subtotal }} Bs.</div>
-                <Button icon="pi pi-times" class="p-button-sm p-button-text p-button-danger" @click="eliminarItem(index)" />
+                <!-- ✅ MEJORA 3: Botones disminuir y eliminar -->
+                <div class="flex gap-1">
+                  <Button icon="pi pi-minus" class="p-button-sm p-button-rounded p-button-warning"
+                    @click="disminuirCantidad(index)" v-tooltip.top="'Disminuir cantidad'" />
+                  <Button icon="pi pi-times" class="p-button-sm p-button-rounded p-button-danger"
+                    @click="eliminarItem(index)" v-tooltip.top="'Eliminar producto'" />
+                </div>
               </div>
             </div>
           </div>
@@ -248,26 +287,114 @@ const servicios = ref([
       </div>
       <template #footer>
         <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="showNuevoCliente = false" />
-        <Button label="Guardar y Seleccionar" icon="pi pi-check" @click="crearCliente" :disabled="!nuevoCliente.ci_nit || !nuevoCliente.nombre_completo" />
+        <Button label="Guardar y Seleccionar" icon="pi pi-check" @click="crearCliente"
+          :disabled="!nuevoCliente.ci_nit || !nuevoCliente.nombre_completo" />
       </template>
     </Dialog>
   </div>
 </template>
 
 <style scoped>
-.venta-container { height: calc(100vh - 120px); display: flex; flex-direction: column; overflow: hidden; }
-.venta-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 1rem; flex-shrink: 0; }
-.venta-body { flex: 1; display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; overflow: hidden; min-height: 0; }
-.columna-izquierda { display: flex; flex-direction: column; gap: 1rem; overflow: hidden; min-height: 0; }
-.cliente-card { flex-shrink: 0; margin: 0; }
-.productos-card { flex: 1; margin: 0; overflow: hidden; display: flex; flex-direction: column; }
-.productos-card :deep(.p-tabview-panels) { flex: 1; overflow: hidden; padding: 0; }
-.productos-card :deep(.p-tabview) { display: flex; flex-direction: column; height: 100%; }
-.columna-derecha { overflow: hidden; min-height: 0; }
-.resumen-card { height: 100%; margin: 0; display: flex; flex-direction: column; overflow: hidden; }
-.items-lista { flex: 1; overflow-y: auto; padding-right: 0.5rem; }
-.item-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border-bottom: 1px solid #eee; }
-.item-row:hover { background: #f8f9fa; }
-.cliente-info { border-left: 4px solid #4caf50; }
-@media (max-width: 992px) { .venta-body { grid-template-columns: 1fr; overflow-y: auto; } }
+.venta-container {
+  height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.venta-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+.venta-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.columna-izquierda {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.cliente-card {
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.productos-card {
+  flex: 1;
+  margin: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.productos-card :deep(.p-tabview-panels) {
+  flex: 1;
+  overflow: hidden;
+  padding: 0;
+}
+
+.productos-card :deep(.p-tabview) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.columna-derecha {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.resumen-card {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.items-lista {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-bottom: 1px solid #eee;
+}
+
+.item-row:hover {
+  background: #f8f9fa;
+}
+
+.cliente-info {
+  border-left: 4px solid #4caf50;
+}
+
+@media (max-width: 992px) {
+  .venta-body {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+}
 </style>

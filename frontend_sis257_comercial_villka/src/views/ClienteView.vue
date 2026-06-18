@@ -51,12 +51,14 @@ const editCliente = (cliente: Cliente) => {
 }
 
 const deleteCliente = async (cliente: Cliente) => {
-  try {
-    await ClienteAPI.delete(cliente.id)
-    toast.add({ severity: 'success', summary: 'Éxito', detail: 'Cliente eliminado', life: 3000 })
-    await loadClientes()
-  } catch {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo eliminar', life: 3000 })
+  if (confirm(`¿Está seguro de eliminar al cliente ${cliente.nombre_completo}?`)) {
+    try {
+      await ClienteAPI.delete(cliente.id)
+      toast.add({ severity: 'success', summary: 'Éxito', detail: 'Cliente eliminado', life: 3000 })
+      await loadClientes()
+    } catch {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo eliminar', life: 3000 })
+    }
   }
 }
 

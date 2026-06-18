@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Marca } from '../../marcas/entities/marca.entity';
 
 @Entity('modelos')
@@ -13,5 +19,6 @@ export class Modelo {
   marca_id: number;
 
   @ManyToOne(() => Marca, { nullable: false })
+  @JoinColumn({ name: 'marca_id' })
   marca: Marca;
 }

@@ -17,8 +17,8 @@ export class Venta {
   @Column('decimal', { precision: 12, scale: 2, default: 0 })
   total: number;
 
-  @Column('varchar', { length: 20, default: 'pendiente' })
-  estado: 'pendiente' | 'pagado' | 'anulado';
+  @Column('varchar', { length: 20, default: 'activa' })
+  estado: string;
 
   @CreateDateColumn({ name: 'fecha_creacion' })
   fechaCreacion: Date;

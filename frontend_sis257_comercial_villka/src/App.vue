@@ -1,39 +1,20 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
+//import '@/assets/lib/wow/wow.min.js'
+//import '@/assets/lib/easing/easing.min.js'
+//port '@/assets/lib/waypoints/waypoints.min.js'
+//import '@/assets/lib/counterup/counterup.min.js'
+//import '@/assets/lib/owlcarousel/owl.carousel.min.js'
+//import '@/assets/lib/tempusdominus/js/moment.min.js'
+//import '@/assets/lib/tempusdominus/js/moment-timezone.min.js'
+//import '@/assets/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js'
+
 </script>
 
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-      <RouterLink class="navbar-brand" to="/">Comercial Vill-K</RouterLink>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNav"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><RouterLink class="nav-link" to="/">Inicio</RouterLink></li>
-          <li class="nav-item"><RouterLink class="nav-link" to="/llantas">Llantas</RouterLink></li>
-          <li class="nav-item">
-            <RouterLink class="nav-link" to="/categorias">Categorías</RouterLink>
-          </li>
-          <li class="nav-item">
-            <RouterLink class="nav-link" to="/servicios">Servicios</RouterLink>
-          </li>
-          <li class="nav-item">
-            <RouterLink class="nav-link" to="/clientes">Clientes</RouterLink>
-          </li>
-          <li class="nav-item"><RouterLink class="nav-link" to="/login">Login</RouterLink></li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-
-  <main class="container mt-4">
-    <RouterView />
-  </main>
+  <RouterView />
 </template>
+
+<style>
+
+</style>

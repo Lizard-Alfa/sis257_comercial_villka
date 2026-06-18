@@ -5,42 +5,31 @@ import { useAuthStore } from '@/stores'
 import Menubar from 'primevue/menubar'
 import Button from 'primevue/button'
 import Badge from 'primevue/badge'
+import type { MenuItem } from 'primevue/menuitem' // ← AGREGAR
 
 const router = useRouter()
 const authStore = useAuthStore()
 
-const menuItems = computed(() => {
-  const items = [
+const menuItems = computed<MenuItem[]>(() => {  // ← TIPAR como MenuItem[]
+  const items: MenuItem[] = [
     {
       label: 'Dashboard',
       icon: 'pi pi-home',
       command: () => router.push('/'),
     },
     {
-      label: 'Ventas',
-      icon: 'pi pi-shopping-cart',
-      command: () => router.push('/ventas'),
-    },
-    {
       label: 'Servicios',
       icon: 'pi pi-wrench',
       items: [
-        {
-          label: 'Venta de Llantas',
-          icon: 'pi pi-circle',
-          command: () => router.push('/llantas'),
-        },
-        {
-          label: 'Lavado de Autos',
-          icon: 'pi pi-car',
-          command: () => router.push('/servicios?tipo=lavado'),
-        },
-        {
-          label: 'Alineamiento',
-          icon: 'pi pi-sliders-h',
-          command: () => router.push('/servicios?tipo=alineamiento'),
-        },
+        { label: 'Venta de Llantas', icon: 'pi pi-circle', command: () => router.push('/ventas') },
+        { label: 'Lavado', icon: 'pi pi-car', command: () => router.push('/servicios?tipo=lavado') },
+        { label: 'Alineamiento', icon: 'pi pi-sliders-h', command: () => router.push('/servicios?tipo=alineamiento') },
       ],
+    },
+    {
+      label: 'Llantas',
+      icon: 'pi pi-discord',
+      command: () => router.push('/llantas'),
     },
     {
       label: 'Clientes',
@@ -49,32 +38,28 @@ const menuItems = computed(() => {
     },
   ]
 
-  // ✅ Solo ADMIN ve estas opciones
   if (authStore.isAdmin) {
     items.push(
       {
-        label: 'Inventario',
-        icon: 'pi pi-box',
-        command: () => router.push('/inventario'),
+        label: 'Historial Ventas',
+        icon: 'pi pi-history',
+        command: () => router.push('/historial-ventas'),
       },
       {
-        label: 'Categorías',
-        icon: 'pi pi-tags',
-        command: () => router.push('/categorias'),
+        label: 'Compras',
+        icon: 'pi pi-shopping-bag',
+        items: [  // ← AHORA SÍ FUNCIONA
+          { label: 'Registrar Compra', icon: 'pi pi-plus', command: () => router.push('/compras') },
+          { label: 'Proveedores', icon: 'pi pi-truck', command: () => router.push('/proveedores') },
+        ],
       },
       {
-        label: 'Reportes',
-        icon: 'pi pi-chart-bar',
-        command: () => router.push('/reportes'),
-      },
-      {
-        label: 'Usuarios',
-        icon: 'pi pi-user',
-        command: () => router.push('/usuarios'),
+        label: 'Marcas',
+        icon: 'pi pi-tag',
+        command: () => router.push('/marcas'),
       }
     )
   }
-
   return items
 })
 
@@ -85,7 +70,6 @@ const handleLogout = () => {
 
 <template>
   <div class="layout-wrapper">
-    <!-- Menú Superior -->
     <Menubar :model="menuItems" class="layout-menubar">
       <template #start>
         <div class="flex align-items-center gap-2">
@@ -112,7 +96,6 @@ const handleLogout = () => {
       </template>
     </Menubar>
 
-    <!-- Contenido Principal -->
     <main class="layout-content">
       <RouterView />
     </main>
@@ -126,12 +109,10 @@ const handleLogout = () => {
   flex-direction: column;
   background: #f8f9fa;
 }
-
 .layout-menubar {
   border-radius: 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 .layout-content {
   flex: 1;
   padding: 1.5rem;

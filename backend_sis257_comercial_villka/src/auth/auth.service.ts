@@ -18,11 +18,17 @@ export class AuthService {
     const claveValida = await bcrypt.compare(dto.clave, usuario.clave);
     if (!claveValida) throw new UnauthorizedException('Credenciales inválidas');
 
-    const payload = { sub: usuario.id, usuario: usuario.usuario };
-    return {
-      access_token: this.jwtService.sign(payload),
-      usuario: usuario.usuario,
-      nombre_completo: usuario.nombre_completo,
-    };
+    const payload = { 
+  sub: usuario.id, 
+  usuario: usuario.usuario,
+  rol: usuario.rol  // ← AGREGAR
+};
+
+return {
+  access_token: this.jwtService.sign(payload),
+  usuario: usuario.usuario,
+  nombre_completo: usuario.nombre_completo,
+  rol: usuario.rol  // ← AGREGAR
+};
   }
 }

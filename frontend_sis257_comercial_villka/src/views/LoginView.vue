@@ -52,7 +52,7 @@ const handleLogin = async () => {
           <InputText
             id="usuario"
             v-model="usuario"
-            placeholder="admin"
+            placeholder="Usuario"
             @keyup.enter="handleLogin"
           />
         </div>
@@ -62,7 +62,7 @@ const handleLogin = async () => {
             id="clave"
             type="password"
             v-model="clave"
-            placeholder="••••••"
+            placeholder="Contraseña"
             @keyup.enter="handleLogin"
           />
         </div>

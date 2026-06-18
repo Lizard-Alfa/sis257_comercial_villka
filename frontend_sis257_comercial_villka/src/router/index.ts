@@ -9,78 +9,41 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('../views/LoginView.vue'),
+      meta: { requiresGuest: true },
     },
     {
       path: '/',
-      component: AppLayout, // Rutas protegidas usan layout
+      component: AppLayout,
       meta: { requiresAuth: true },
       children: [
-        {
-          path: '',
-          name: 'home',
-          component: () => import('../views/HomeView.vue'),
-        },
-        {
-          path: 'categorias',
-          name: 'categorias',
-          component: () => import('../views/CategoriaView.vue'),
-          meta: { requiresAdmin: true },
-        },
-        {
-          path: 'servicios',
-          name: 'servicios',
-          component: () => import('../views/ServicioView.vue'),
-        },
-        {
-          path: 'clientes',
-          name: 'clientes',
-          component: () => import('../views/ClienteView.vue'),
-        },
-        {
-          path: 'llantas',
-          name: 'llantas',
-          component: () => import('../views/LlantaView.vue'),
-        },
-        {
-          path: 'inventario',
-          name: 'inventario',
-          component: () => import('../views/LlantaView.vue'),
-          meta: { requiresAdmin: true },
-        },
-        {
-          path: 'ventas',
-          name: 'ventas',
-          component: () => import('../views/VentaView.vue'),
-        },
-        {
-          path: 'ventas',
-          name: 'ventas',
-          component: () => import('../views/VentaView.vue'),
-        },
+        { path: '', name: 'home', component: () => import('../views/HomeView.vue') },
+
+        // RUTAS PARA TODOS (admin y empleado)
+        { path: 'ventas', name: 'ventas', component: () => import('../views/VentaView.vue') },
+        { path: 'llantas', name: 'llantas', component: () => import('../views/LlantaView.vue') },
+        { path: 'clientes', name: 'clientes', component: () => import('../views/ClienteView.vue') },
+        { path: 'servicios', name: 'servicios', component: () => import('../views/ServicioView.vue') },
+
+        // SOLO ADMIN
+        { path: 'historial-ventas', name: 'historial-ventas', component: () => import('../views/HistorialVentas.vue'), meta: { requiresAdmin: true } },
+        { path: 'marcas', name: 'marcas', component: () => import('../views/MarcaView.vue'), meta: { requiresAdmin: true } },
+        { path: 'compras', name: 'compras', component: () => import('../views/CompraView.vue'), meta: { requiresAdmin: true } },
+        { path: 'proveedores', name: 'proveedores', component: () => import('../views/ProveedorView.vue'), meta: { requiresAdmin: true } },
       ],
     },
   ],
 })
 
-// Guard autenticación
-router.beforeEach((to, from, next) => {
+router.beforeEach((to) => {
   const authStore = useAuthStore()
-  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
-  const requiresAdmin = to.matched.some((record) => record.meta.requiresAdmin)
+  const requiresAuth = to.matched.some((r) => r.meta.requiresAuth)
+  const requiresGuest = to.matched.some((r) => r.meta.requiresGuest)
+  const requiresAdmin = to.matched.some((r) => r.meta.requiresAdmin)
 
-  // Seccion autenticación
-  if (requiresAuth && !authStore.token) {
-    next({ name: 'login' })
-    return
-  }
-
-  // Sie requiere admin, sino ir a home
-  if (requiresAdmin && !authStore.isAdmin) {
-    next({ name: 'home' })
-    return
-  }
-
-  next()
+  if (requiresAuth && !authStore.token) return { name: 'login' }
+  if (requiresGuest && authStore.token) return { name: 'home' }
+  if (requiresAdmin && !authStore.isAdmin) return { name: 'home' }
+  return true
 })
 
 export default router

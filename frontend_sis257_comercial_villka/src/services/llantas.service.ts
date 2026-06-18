@@ -1,16 +1,19 @@
 import http from '@/plugins/axios'
 
+export interface Marca {
+  id: number
+  nombre: string
+}
+
 export interface Llanta {
   id: number
   codigo: string
-  marca: string
+  marca_id: number
+  marca: Marca | null
   modelo: string
   medida: string
   precio: number
   stock: number
-  imagen_url: string | null
-  categoria_id: number
-  categoria: { id: number, nombre: string }
 }
 
 export const LlantasService = {

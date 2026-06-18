@@ -24,8 +24,8 @@ export const useAuthStore = defineStore('auth', {
       localStorage.setItem('user', this.user)
       localStorage.setItem('token', this.token || '')
       localStorage.setItem('rol', this.rol || '')
-
-      router.push('/ventas')
+      //El inicio
+      router.push('/')
     },
     logout() {
       localStorage.clear()

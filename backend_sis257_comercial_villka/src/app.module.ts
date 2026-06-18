@@ -47,7 +47,7 @@ import { DetalleComprasModule } from './detalle-compras/detalle-compras.module';
         Venta,
         DetalleVenta,
         Usuario,
-        // ENTIDADES AÑADIDAS AQUÍ
+        // ENTIDADES NUEVAS
         Marca,
         Modelo,
         Proveedor,
@@ -63,6 +63,7 @@ import { DetalleComprasModule } from './detalle-compras/detalle-compras.module';
     VentasModule,
     UsuariosModule,
     AuthModule,
+    // NUEVOS MODULES
     ProveedoresModule,
     ComprasModule,
     MarcasModule,
